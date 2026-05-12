@@ -654,23 +654,23 @@ class ResumeApp {
     if (!container) return;
 
     container.innerHTML = this.data.skills.map(cat => `
-      <div class="card p-5" data-skill-cat-id="${cat.id}">
-        <div class="flex items-center justify-between mb-4">
-          <input type="text" class="input-field font-semibold text-blue-900 w-32" value="${cat.category || ''}" data-action="update-category" data-cat-id="${cat.id}">
-          <div class="flex items-center gap-2">
-            <button class="btn-secondary btn-sm" data-action="add-skill" data-cat-id="${cat.id}">
-              <i class="fas fa-plus"></i>
+      <div class="skill-card" data-skill-cat-id="${cat.id}">
+        <div class="skill-category-header">
+          <input type="text" class="skill-category-input" value="${cat.category || ''}" placeholder="分类名称" data-action="update-category" data-cat-id="${cat.id}">
+          <div class="skill-actions">
+            <button class="add-skill-btn" data-action="add-skill" data-cat-id="${cat.id}">
+              <i class="fas fa-plus"></i> 添加技能
             </button>
-            <button class="btn-danger btn-sm" data-action="remove-category" data-cat-id="${cat.id}">
+            <button class="btn-danger" data-action="remove-category" data-cat-id="${cat.id}">
               <i class="fas fa-trash-alt"></i>
             </button>
           </div>
         </div>
-        <div class="space-y-2">
+        <div class="skill-tags-container" data-cat-id="${cat.id}">
           ${(cat.items || []).map(skill => `
-            <div class="flex items-center gap-2">
-              <input type="text" class="skill-input" placeholder="技能名称" value="${skill.name || ''}" data-skill-id="${skill.id}" data-cat-id="${cat.id}">
-              <button class="p-2 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500" data-action="remove-skill" data-cat-id="${cat.id}" data-skill-id="${skill.id}">
+            <div class="skill-tag" data-skill-id="${skill.id}">
+              <input type="text" class="skill-tag-text" value="${skill.name || ''}" placeholder="技能" data-skill-id="${skill.id}" data-cat-id="${cat.id}">
+              <button class="skill-tag-delete" data-action="remove-skill" data-cat-id="${cat.id}" data-skill-id="${skill.id}">
                 <i class="fas fa-times"></i>
               </button>
             </div>
@@ -707,7 +707,7 @@ class ResumeApp {
       });
     });
 
-    document.querySelectorAll('.skill-input').forEach(input => {
+    document.querySelectorAll('.skill-tag-text').forEach(input => {
       input.addEventListener('input', () => {
         this.updateSkill(parseInt(input.dataset.catId), parseInt(input.dataset.skillId), input.value);
       });
