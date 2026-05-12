@@ -8,325 +8,173 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx-preview/0.1.18/docx-preview.min.js"></script>
   <link rel="stylesheet" href="css/style.css">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            serif: ['Noto Serif SC', 'serif'],
-            sans: ['Noto Sans SC', 'sans-serif'],
-          },
-          colors: {
-            primary: {
-              50: '#f0f9ff',
-              100: '#e0f2fe',
-              200: '#bae6fd',
-              300: '#7dd3fc',
-              400: '#38bdf8',
-              500: '#0ea5e9',
-              600: '#0284c7',
-              700: '#0369a1',
-              800: '#075985',
-              900: '#0c4a6e',
-            },
-            ink: {
-              50: '#f8fafc',
-              100: '#f1f5f9',
-              200: '#e2e8f0',
-              300: '#cbd5e1',
-              400: '#94a3b8',
-              500: '#64748b',
-              600: '#475569',
-              700: '#334155',
-              800: '#1e293b',
-              900: '#0f172a',
-            },
-            accent: {
-              light: '#f59e0b',
-              DEFAULT: '#d97706',
-              dark: '#b45309',
-            }
-          }
-        }
-      }
-    }
-  </script>
 </head>
 <body>
   <div id="app">
-    <!-- 顶部操作栏 -->
-    <header class="fixed top-0 right-0 left-0 bg-white border-b border-ink-200 z-40" style="height: var(--topbar-height);">
-      <div class="flex items-center justify-between h-full px-6">
-        <div class="flex items-center gap-4">
-          <button id="toggleSidebar" class="p-2 rounded-lg hover:bg-ink-100 transition-colors lg:hidden">
-            <i class="fas fa-bars text-ink-600"></i>
+    <header class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-b border-blue-100 z-50 h-14">
+      <div class="flex items-center justify-between h-full px-6 max-w-6xl mx-auto">
+        <div class="flex items-center gap-3">
+          <button id="menuToggle" class="lg:hidden p-2 rounded-lg hover:bg-blue-50">
+            <i class="fas fa-bars text-blue-600"></i>
           </button>
-          <h1 class="font-serif text-xl font-bold text-ink-800">
-            <i class="fas fa-id-card text-primary-500 mr-2"></i>个人简历作品集
+          <h1 class="text-lg font-bold text-blue-900">
+            <i class="fas fa-id-card text-blue-500 mr-2"></i>个人简历作品集
           </h1>
         </div>
         <div class="flex items-center gap-3">
-          <button onclick="app.importJSON()" class="btn-secondary text-sm">
-            <i class="fas fa-upload"></i> 导入
-          </button>
-          <button onclick="app.exportJSON()" class="btn-secondary text-sm">
-            <i class="fas fa-download"></i> 导出JSON
-          </button>
-          <button onclick="app.toggleVersionHistory()" class="btn-secondary text-sm">
-            <i class="fas fa-history"></i> 版本历史
-          </button>
-          <button onclick="app.exportWord()" class="btn-secondary text-sm">
-            <i class="fas fa-file-word"></i> Word
-          </button>
-          <button onclick="app.exportPDF()" class="btn-secondary text-sm">
-            <i class="fas fa-file-pdf"></i> PDF
-          </button>
-          <button onclick="app.togglePreview()" class="btn-secondary text-sm">
-            <i class="fas fa-eye"></i> 预览
-          </button>
-          <button onclick="app.saveData()" class="btn-primary text-sm">
-            <i class="fas fa-save"></i> 保存
+          <button id="exportPdfBtn" class="btn-primary">
+            <i class="fas fa-file-pdf"></i> 保存为PDF
           </button>
         </div>
       </div>
     </header>
 
-    <!-- 左侧导航栏 -->
-    <aside id="sidebar" class="sidebar fixed left-0 top-0 h-full bg-white border-r border-ink-200 z-30 pt-16">
+    <aside id="sidebar" class="sidebar">
       <div class="p-4">
-        <div class="mb-6 px-3">
-          <div class="flex items-center gap-3 mb-1">
-            <div class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
-              <i class="fas fa-user text-primary-600"></i>
+        <div class="user-info-card mb-6 p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-blue-200 flex items-center justify-center overflow-hidden" id="navAvatar">
+              <i class="fas fa-user text-blue-600"></i>
             </div>
             <div>
-              <div class="font-semibold text-ink-800 text-sm" id="navUserName">未填写姓名</div>
-              <div class="text-xs text-ink-400" id="navUserTitle">未填写求职意向</div>
+              <div class="font-semibold text-blue-900" id="navUserName">未填写姓名</div>
+              <div class="text-sm text-blue-500" id="navUserTitle">未填写求职意向</div>
             </div>
           </div>
         </div>
         <nav class="space-y-1">
-          <a href="#basic" class="nav-item active flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-ink-600 hover:bg-ink-50" data-section="basic">
-            <i class="fas fa-user-circle w-5 text-center"></i>
+          <a href="#basic" class="nav-item active" data-section="basic">
+            <i class="fas fa-user-circle"></i>
             <span>基本信息</span>
           </a>
-          <a href="#education" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-ink-600 hover:bg-ink-50" data-section="education">
-            <i class="fas fa-graduation-cap w-5 text-center"></i>
+          <a href="#education" class="nav-item" data-section="education">
+            <i class="fas fa-graduation-cap"></i>
             <span>教育经历</span>
           </a>
-          <a href="#projects" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-ink-600 hover:bg-ink-50" data-section="projects">
-            <i class="fas fa-folder-open w-5 text-center"></i>
+          <a href="#projects" class="nav-item" data-section="projects">
+            <i class="fas fa-folder-open"></i>
             <span>项目经历</span>
-            <span class="ml-auto text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full" id="projectCount">0</span>
+            <span class="nav-badge" id="projectCount">0</span>
           </a>
-          <a href="#campus" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-ink-600 hover:bg-ink-50" data-section="campus">
-            <i class="fas fa-school w-5 text-center"></i>
+          <a href="#campus" class="nav-item" data-section="campus">
+            <i class="fas fa-school"></i>
             <span>校园经历</span>
           </a>
-          <a href="#skills" class="nav-item flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-ink-600 hover:bg-ink-50" data-section="skills">
-            <i class="fas fa-tools w-5 text-center"></i>
+          <a href="#skills" class="nav-item" data-section="skills">
+            <i class="fas fa-tools"></i>
             <span>个人技能</span>
           </a>
         </nav>
       </div>
-      <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-ink-200">
-        <button onclick="app.toggleTheme()" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-ink-500 hover:bg-ink-50 w-full transition-colors">
-          <i class="fas fa-moon w-5 text-center"></i>
-          <span>深色模式</span>
-        </button>
-      </div>
     </aside>
 
-    <!-- 主内容区 -->
-    <main id="mainContent" class="main-content pt-16 min-h-screen">
-      <div class="p-6 max-w-5xl mx-auto">
-        <!-- 基本信息 -->
-        <section id="basic" class="mb-8 animate-fade-in">
+    <main id="mainContent" class="main-content">
+      <div class="p-6 max-w-4xl mx-auto">
+        
+        <section id="basic" class="section active">
           <h2 class="section-title">基本信息</h2>
           <div class="card p-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div class="md:col-span-2 grid grid-cols-2 gap-4">
-                <div class="col-span-2 md:col-span-1">
-                  <label class="block text-sm font-medium text-ink-600 mb-2">姓名</label>
-                  <input type="text" class="input-field" data-field="name" placeholder="请输入姓名" value="">
+                <div class="col-span-2 sm:col-span-1">
+                  <label class="label">姓名</label>
+                  <input type="text" class="input-field" data-field="name" placeholder="请输入姓名">
                 </div>
-                <div class="col-span-2 md:col-span-1">
-                  <label class="block text-sm font-medium text-ink-600 mb-2">性别</label>
+                <div class="col-span-2 sm:col-span-1">
+                  <label class="label">性别</label>
                   <select class="input-field" data-field="gender">
                     <option value="">请选择</option>
                     <option value="男">男</option>
                     <option value="女">女</option>
                   </select>
                 </div>
-                <div class="col-span-2 md:col-span-1">
-                  <label class="block text-sm font-medium text-ink-600 mb-2">政治面貌</label>
-                  <input type="text" class="input-field" data-field="political" placeholder="如：中共党员" value="">
+                <div class="col-span-2 sm:col-span-1">
+                  <label class="label">政治面貌</label>
+                  <input type="text" class="input-field" data-field="political" placeholder="如：中共党员">
                 </div>
-                <div class="col-span-2 md:col-span-1">
-                  <label class="block text-sm font-medium text-ink-600 mb-2">籍贯</label>
-                  <input type="text" class="input-field" data-field="hometown" placeholder="如：北京市" value="">
+                <div class="col-span-2 sm:col-span-1">
+                  <label class="label">籍贯</label>
+                  <input type="text" class="input-field" data-field="hometown" placeholder="如：北京市">
                 </div>
-                <div class="col-span-2 md:col-span-1">
-                  <label class="block text-sm font-medium text-ink-600 mb-2">求职意向</label>
-                  <input type="text" class="input-field" data-field="jobTarget" placeholder="如：前端工程师" value="">
+                <div class="col-span-2 sm:col-span-1">
+                  <label class="label">求职意向</label>
+                  <input type="text" class="input-field" data-field="jobTarget" placeholder="如：前端工程师">
                 </div>
-                <div class="col-span-2 md:col-span-1">
-                  <label class="block text-sm font-medium text-ink-600 mb-2">出生年月</label>
-                  <input type="month" class="input-field" data-field="birthDate" value="">
+                <div class="col-span-2 sm:col-span-1">
+                  <label class="label">出生年月</label>
+                  <input type="month" class="input-field" data-field="birthDate">
                 </div>
-                <div class="col-span-2 md:col-span-1">
-                  <label class="block text-sm font-medium text-ink-600 mb-2">电子邮箱</label>
-                  <input type="email" class="input-field" data-field="email" placeholder="example@email.com" value="">
+                <div class="col-span-2 sm:col-span-1">
+                  <label class="label">电子邮箱</label>
+                  <input type="email" class="input-field" data-field="email" placeholder="example@email.com">
                 </div>
-                <div class="col-span-2 md:col-span-1">
-                  <label class="block text-sm font-medium text-ink-600 mb-2">联系方式</label>
-                  <input type="tel" class="input-field" data-field="phone" placeholder="138xxxxxxxxx" value="">
+                <div class="col-span-2 sm:col-span-1">
+                  <label class="label">联系方式</label>
+                  <input type="tel" class="input-field" data-field="phone" placeholder="138xxxxxxxx">
                 </div>
               </div>
               <div class="flex flex-col items-center">
-                <label class="block text-sm font-medium text-ink-600 mb-2">个人头像</label>
-                <div class="relative group cursor-pointer" onclick="document.getElementById('avatarInput').click()">
-                  <div id="avatarPreview" class="w-32 h-32 rounded-2xl bg-ink-100 flex items-center justify-center overflow-hidden border-2 border-dashed border-ink-300 group-hover:border-primary-400 transition-colors">
-                    <i class="fas fa-camera text-ink-400 text-2xl group-hover:text-primary-500 transition-colors"></i>
+                <label class="label">个人头像</label>
+                <div class="avatar-upload" id="avatarUpload">
+                  <div id="avatarPreview" class="avatar-preview">
+                    <i class="fas fa-camera"></i>
                   </div>
-                  <div class="absolute inset-0 rounded-2xl bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span class="text-white text-sm font-medium">更换头像</span>
+                  <div class="avatar-overlay">
+                    <span>更换头像</span>
                   </div>
                 </div>
-                <input type="file" id="avatarInput" class="hidden" accept="image/*" onchange="app.handleAvatarUpload(event)">
-                <p class="text-xs text-ink-400 mt-2">点击上传头像</p>
+                <input type="file" id="avatarInput" class="hidden" accept="image/*">
+                <p class="text-xs text-blue-400 mt-2">点击上传 (3:4比例)</p>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- 教育经历 -->
-        <section id="education" class="mb-8 hidden">
+        <section id="education" class="section">
           <div class="flex items-center justify-between mb-5">
             <h2 class="section-title mb-0">教育经历</h2>
-            <button onclick="app.addEducation()" class="btn-primary text-sm">
+            <button class="btn-primary" id="addEducationBtn">
               <i class="fas fa-plus"></i> 添加经历
             </button>
           </div>
-          <div id="educationList" class="space-y-4">
-            <!-- 动态生成 -->
-          </div>
+          <div id="educationList" class="space-y-4"></div>
         </section>
 
-        <!-- 项目经历 -->
-        <section id="projects" class="mb-8 hidden">
+        <section id="projects" class="section">
           <div class="flex items-center justify-between mb-5">
             <h2 class="section-title mb-0">项目经历</h2>
-            <button onclick="app.addProject()" class="btn-primary text-sm">
+            <button class="btn-primary" id="addProjectBtn">
               <i class="fas fa-plus"></i> 添加项目
             </button>
           </div>
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-1">
-              <div class="card p-4">
-                <div class="relative mb-3">
-                  <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 text-sm"></i>
-                  <input type="text" class="input-field pl-9 text-sm" placeholder="搜索项目..." oninput="app.filterProjects(this.value)">
-                </div>
-                <div id="projectList" class="space-y-2 max-h-96 overflow-y-auto">
-                  <!-- 动态生成 -->
-                </div>
-              </div>
-            </div>
-            <div class="lg:col-span-2">
-              <div id="projectDetail" class="card p-6">
-                <div class="text-center py-12 text-ink-400">
-                  <i class="fas fa-folder-open text-4xl mb-3"></i>
-                  <p>选择一个项目进行编辑，或创建新项目</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div id="projectsList" class="space-y-4"></div>
         </section>
 
-        <!-- 校园经历 -->
-        <section id="campus" class="mb-8 hidden">
+        <section id="campus" class="section">
           <div class="flex items-center justify-between mb-5">
             <h2 class="section-title mb-0">校园经历</h2>
-            <button onclick="app.addCampus()" class="btn-primary text-sm">
+            <button class="btn-primary" id="addCampusBtn">
               <i class="fas fa-plus"></i> 添加经历
             </button>
           </div>
-          <div id="campusList" class="space-y-4">
-            <!-- 动态生成 -->
-          </div>
+          <div id="campusList" class="space-y-4"></div>
         </section>
 
-        <!-- 个人技能 -->
-        <section id="skills" class="mb-8 hidden">
+        <section id="skills" class="section">
           <div class="flex items-center justify-between mb-5">
             <h2 class="section-title mb-0">个人技能</h2>
-            <button onclick="app.addSkillCategory()" class="btn-primary text-sm">
+            <button class="btn-primary" id="addSkillCategoryBtn">
               <i class="fas fa-plus"></i> 添加分类
             </button>
           </div>
-          <div id="skillsList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- 动态生成 -->
-          </div>
+          <div id="skillsList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
         </section>
       </div>
     </main>
 
-    <!-- 底部状态栏 -->
-    <footer class="fixed bottom-0 right-0 bg-white border-t border-ink-200 z-40 text-xs text-ink-500 px-6 py-2 flex items-center justify-between" style="left: var(--sidebar-width); height: var(--bottombar-height);">
-      <div class="flex items-center gap-4">
-        <span id="saveStatus"><i class="fas fa-check-circle text-green-500 mr-1"></i>已自动保存</span>
-        <span id="lastSaveTime">--</span>
-      </div>
-      <div class="flex items-center gap-4">
-        <span id="wordCount">字数统计: 0</span>
-        <span>v1.0.0</span>
-      </div>
-    </footer>
-
-    <!-- 预览模态框 -->
-    <div id="previewModal" class="preview-modal" onclick="if(event.target===this)app.togglePreview()">
-      <div class="preview-content p-8">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="font-serif text-2xl font-bold text-ink-800">简历预览</h2>
-          <button onclick="app.togglePreview()" class="p-2 rounded-lg hover:bg-ink-100 transition-colors">
-            <i class="fas fa-times text-ink-500"></i>
-          </button>
-        </div>
-        <div id="previewContent" class="prose max-w-none">
-          <!-- 动态生成 -->
-        </div>
-      </div>
-    </div>
-
-    <!-- 版本历史模态框 -->
-    <div id="versionModal" class="version-modal" onclick="if(event.target===this)app.toggleVersionHistory()">
-      <div class="version-content">
-        <div class="p-4 border-b border-ink-200 flex items-center justify-between">
-          <h3 class="font-serif text-lg font-bold text-ink-800">
-            <i class="fas fa-history text-primary-500 mr-2"></i>版本历史
-          </h3>
-          <button onclick="app.toggleVersionHistory()" class="p-2 rounded-lg hover:bg-ink-100 transition-colors">
-            <i class="fas fa-times text-ink-500"></i>
-          </button>
-        </div>
-        <div id="versionList" class="max-h-96 overflow-y-auto">
-          <!-- 动态生成 -->
-        </div>
-        <div class="p-4 border-t border-ink-200 text-xs text-ink-400 text-center">
-          保留最近10个版本
-        </div>
-      </div>
-    </div>
-
-    <!-- Toast提示 -->
     <div id="toast" class="toast"></div>
   </div>
 
