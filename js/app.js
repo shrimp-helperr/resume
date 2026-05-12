@@ -1,3 +1,252 @@
+(function() {
+  const canvas = document.getElementById('bgCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, time = 0;
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const particles = [];
+  for (let i = 0; i < 60; i++) {
+    particles.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: 1 + Math.random() * 3,
+      vx: -0.3 + Math.random() * 0.6,
+      vy: -0.2 - Math.random() * 0.8,
+      alpha: 0.3 + Math.random() * 0.7,
+      phase: Math.random() * Math.PI * 2
+    });
+  }
+
+  function drawSky() {
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#1a3a5c');
+    grad.addColorStop(0.35, '#2a5588');
+    grad.addColorStop(0.65, '#4a8ec8');
+    grad.addColorStop(0.85, '#6aaad8');
+    grad.addColorStop(1, '#8ec8e8');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  function drawSunlight() {
+    const grd = ctx.createRadialGradient(W * 0.15, H * 0.1, 0, W * 0.15, H * 0.1, W * 0.45);
+    grd.addColorStop(0, 'rgba(255, 240, 200, 0.12)');
+    grd.addColorStop(0.5, 'rgba(255, 220, 160, 0.04)');
+    grd.addColorStop(1, 'rgba(255, 200, 140, 0)');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  function drawClouds() {
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+    for (let i = 0; i < 5; i++) {
+      const cx = ((i * W * 0.25 + time * 0.02) % (W + 400)) - 200;
+      const cy = H * 0.15 + i * 40 + Math.sin(time * 0.003 + i) * 15;
+      drawCloud(cx, cy, 80 + i * 30);
+    }
+  }
+
+  function drawCloud(x, y, size) {
+    ctx.beginPath();
+    ctx.arc(x, y, size * 0.5, 0, Math.PI * 2);
+    ctx.arc(x + size * 0.35, y - size * 0.15, size * 0.4, 0, Math.PI * 2);
+    ctx.arc(x + size * 0.7, y, size * 0.45, 0, Math.PI * 2);
+    ctx.arc(x + size * 0.35, y + size * 0.15, size * 0.35, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawGirl() {
+    const gx = W * 0.35;
+    const gy = H * 0.55;
+    ctx.save();
+    ctx.translate(gx, gy);
+    ctx.scale(Math.min(W / 1400, H / 900), Math.min(W / 1400, H / 900));
+
+    ctx.fillStyle = 'rgba(40, 60, 90, 0.65)';
+    ctx.beginPath();
+    ctx.arc(0, -280, 50, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.ellipse(0, -210, 35, 50, 0, Math.PI, 0);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(-30, -170);
+    ctx.lineTo(-38, -80);
+    ctx.lineTo(38, -80);
+    ctx.lineTo(30, -170);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(-32, -80);
+    ctx.quadraticCurveTo(-42, 80, -28, 120);
+    ctx.lineTo(28, 120);
+    ctx.quadraticCurveTo(42, 80, 32, -80);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.ellipse(-45, -100, 8, 35, -0.2, Math.PI, 0);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(45, -100, 8, 35, 0.2, Math.PI, 0);
+    ctx.fill();
+
+    ctx.fillStyle = 'rgba(35, 50, 80, 0.55)';
+    ctx.beginPath();
+    ctx.moveTo(-28, 120);
+    ctx.quadraticCurveTo(-30, 200, -18, 240);
+    ctx.lineTo(-15, 240);
+    ctx.quadraticCurveTo(-20, 200, -22, 120);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(28, 120);
+    ctx.quadraticCurveTo(30, 200, 18, 240);
+    ctx.lineTo(15, 240);
+    ctx.quadraticCurveTo(20, 200, 22, 120);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function drawHair() {
+    const gx = W * 0.35;
+    const gy = H * 0.55;
+    const s = Math.min(W / 1400, H / 900);
+    ctx.save();
+    ctx.translate(gx, gy);
+    ctx.scale(s, s);
+
+    const wind = Math.sin(time * 0.015) * 0.5 + 0.5;
+
+    const strands = [
+      { baseX: 5, baseY: -320, len: 140, angle: -0.6, sway: 0.4, thickness: 3 },
+      { baseX: 15, baseY: -315, len: 155, angle: -0.45, sway: 0.5, thickness: 3.5 },
+      { baseX: 25, baseY: -308, len: 170, angle: -0.3, sway: 0.6, thickness: 4 },
+      { baseX: 35, baseY: -298, len: 185, angle: -0.15, sway: 0.7, thickness: 3.5 },
+      { baseX: 40, baseY: -285, len: 175, angle: 0, sway: 0.75, thickness: 3 },
+      { baseX: -5, baseY: -318, len: 135, angle: -0.75, sway: 0.35, thickness: 2.5 },
+      { baseX: -15, baseY: -312, len: 150, angle: -0.9, sway: 0.3, thickness: 2.5 },
+      { baseX: 45, baseY: -275, len: 160, angle: 0.1, sway: 0.8, thickness: 2.5 },
+      { baseX: 48, baseY: -265, len: 145, angle: 0.2, sway: 0.85, thickness: 2 },
+      { baseX: 10, baseY: -322, len: 160, angle: -0.55, sway: 0.55, thickness: 3 },
+      { baseX: 30, baseY: -302, len: 190, angle: -0.2, sway: 0.65, thickness: 3 },
+      { baseX: -25, baseY: -305, len: 140, angle: -1.0, sway: 0.25, thickness: 2 },
+    ];
+
+    strands.forEach((strand, i) => {
+      const swayOffset = Math.sin(time * 0.02 + i * 0.7 + strand.sway * 3) * strand.sway * 25 * (0.5 + wind * 0.5);
+      const angle = strand.angle + swayOffset * 0.015;
+      const alpha = 0.3 + 0.4 * (1 - i / strands.length);
+
+      ctx.strokeStyle = `rgba(30, 45, 70, ${alpha})`;
+      ctx.lineWidth = strand.thickness;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(strand.baseX, strand.baseY);
+
+      const cp1x = strand.baseX + Math.cos(angle) * strand.len * 0.3 + swayOffset * 0.5;
+      const cp1y = strand.baseY + Math.sin(angle) * strand.len * 0.3 - strand.len * 0.1;
+      const cp2x = strand.baseX + Math.cos(angle) * strand.len * 0.7 + swayOffset;
+      const cp2y = strand.baseY + Math.sin(angle) * strand.len * 0.7 - strand.len * 0.2;
+      const endX = strand.baseX + Math.cos(angle) * strand.len + swayOffset * 1.5;
+      const endY = strand.baseY + Math.sin(angle) * strand.len - strand.len * 0.3;
+
+      ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, endX, endY);
+      ctx.stroke();
+
+      ctx.strokeStyle = `rgba(20, 35, 60, ${alpha * 0.5})`;
+      ctx.lineWidth = strand.thickness * 0.5;
+      ctx.beginPath();
+      ctx.moveTo(strand.baseX + 2, strand.baseY + 2);
+      ctx.bezierCurveTo(cp1x + 2, cp1y + 2, cp2x + 2, cp2y + 2, endX + 2, endY + 2);
+      ctx.stroke();
+    });
+
+    ctx.restore();
+  }
+
+  function drawGrass() {
+    const grassGrad = ctx.createLinearGradient(0, H * 0.82, 0, H);
+    grassGrad.addColorStop(0, 'rgba(60, 120, 80, 0.08)');
+    grassGrad.addColorStop(0.3, 'rgba(50, 100, 70, 0.15)');
+    grassGrad.addColorStop(1, 'rgba(30, 70, 50, 0.25)');
+    ctx.fillStyle = grassGrad;
+    ctx.fillRect(0, H * 0.82, W, H * 0.18);
+
+    for (let i = 0; i < 80; i++) {
+      const gx = i * (W / 80) + Math.sin(i * 7.3) * 8;
+      const sway = Math.sin(time * 0.01 + i * 0.5) * 6;
+      ctx.strokeStyle = `rgba(60, 130, 90, ${0.15 + Math.random() * 0.1})`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(gx, H * 0.82 + Math.random() * 5);
+      ctx.quadraticCurveTo(gx + sway, H * 0.75 - Math.random() * 20, gx + sway * 1.5, H * 0.68 - Math.random() * 30);
+      ctx.stroke();
+    }
+  }
+
+  function drawParticles() {
+    particles.forEach(p => {
+      p.x += p.vx + Math.sin(time * 0.005 + p.phase) * 0.3;
+      p.y += p.vy;
+      if (p.y < -20) { p.y = H + 20; p.x = Math.random() * W; }
+      if (p.x < -20) p.x = W + 20;
+      if (p.x > W + 20) p.x = -20;
+
+      ctx.fillStyle = `rgba(180, 210, 255, ${p.alpha * (0.5 + 0.5 * Math.sin(time * 0.03 + p.phase))})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  function drawLightRays() {
+    for (let i = 0; i < 4; i++) {
+      const rx = W * 0.15 + i * 30;
+      const alpha = 0.02 + 0.02 * Math.sin(time * 0.008 + i * 1.5);
+      const rayGrad = ctx.createLinearGradient(rx, H * 0.05, rx + 50, H * 0.6);
+      rayGrad.addColorStop(0, `rgba(255, 240, 210, ${alpha})`);
+      rayGrad.addColorStop(1, 'rgba(255, 240, 210, 0)');
+      ctx.fillStyle = rayGrad;
+      ctx.beginPath();
+      ctx.moveTo(rx - 20, H * 0.05);
+      ctx.lineTo(rx + 120, H * 0.7);
+      ctx.lineTo(rx + 160, H * 0.7);
+      ctx.lineTo(rx + 10, H * 0.05);
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+
+  function animate() {
+    time++;
+    ctx.clearRect(0, 0, W, H);
+    drawSky();
+    drawSunlight();
+    drawLightRays();
+    drawClouds();
+    drawGrass();
+    drawGirl();
+    drawHair();
+    drawParticles();
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+})();
+
 class ResumeApp {
   constructor() {
     this.data = this.loadData() || this.getDefaultData();
