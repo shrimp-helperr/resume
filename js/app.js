@@ -1,4 +1,5 @@
 (function() {
+  try {
   const canvas = document.getElementById('bgCanvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
@@ -245,6 +246,7 @@
   }
 
   animate();
+  } catch(e) { console.error('Canvas error:', e); }
 })();
 
 class ResumeApp {
@@ -1117,5 +1119,9 @@ class ResumeApp {
 
 let app;
 document.addEventListener('DOMContentLoaded', () => {
-  app = new ResumeApp();
+  try {
+    app = new ResumeApp();
+  } catch(e) {
+    console.error('初始化失败:', e);
+  }
 });
